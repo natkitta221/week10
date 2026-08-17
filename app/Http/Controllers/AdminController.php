@@ -32,11 +32,11 @@ class AdminController extends Controller
     {
         // ตรวจสอบข้อมูล
         $request->validate([
-            'title' => 'required|string|max:255',
+            'title' => 'required|string|max:50',
             'content' => 'required|string',
         ], [
             'title.required' => 'กรุณากรอกชื่อบทความ',
-            'title.max' => 'ชื่อบทความต้องไม่เกิน 255 ตัวอักษร',
+            'title.max' => 'ชื่อบทความต้องไม่เกิน 50 ตัวอักษร',
             'content.required' => 'กรุณากรอกเนื้อหาบทความ',
         ]);
 
@@ -59,5 +59,38 @@ class AdminController extends Controller
             ->delete();
 
         return redirect('/blog2');
+    }
+    function change($id){
+        $blog = DB::table('blogs')->where('id', $id)->first();
+        $data = [
+            'status' =>$blog->status
+        ];
+        if($data['status'] == 0){
+            $data['status'] = 1;
+        }else{
+            $data['status'] = 0;
+        }
+        DB::table('blogs')->where('id', $id)->update($data);
+        return redirect('blog2');
+    }
+    function edit($id){
+        $blog = DB::table('blogs')->where('id', $id)->first();
+        return view('edit', compact('blog'));
+    }
+    function update(Request $request, $id){
+         $request->validate([
+            'title' => 'required|string|max:50',
+            'content' => 'required|string',
+        ], [
+            'title.required' => 'กรุณากรอกชื่อบทความ',
+            'title.max' => 'ชื่อบทความต้องไม่เกิน 50 ตัวอักษร',
+            'content.required' => 'กรุณากรอกเนื้อหาบทความ',
+        ]);
+        $data = [
+            'title' => $request->title,
+            'content' => $request->content,
+        ];
+        DB::table('blogs')->where('id', $id)->update($data);
+        return redirect('blog2');
     }
 }
